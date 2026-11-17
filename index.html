@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Reserva de Pantallas Digitales</title>
+
+  <!-- Script FullCalendar para el modal de calendario -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #12385a;
+      --primary-hover: #1c4b75;
+      --accent: #2563eb;
+      --bg: #f1f5f9;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #cbd5e1;
+      --success-bg: #dcfce7;
+      --success-text: #166534;
+      --error-bg: #fee2e2;
+      --error-text: #991b1b;
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 20px 10px 40px 10px;
+    }
+
+    .contenedor {
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    .tarjeta {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: 0 6px 25px -4px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .encabezado {
+      background: var(--primary);
+      color: white;
+      padding: 26px 20px;
+      text-align: center; /* Título centrado nuevamente */
+    }
+
+    .encabezado h1 {
+      margin: 0 0 6px 0;
+      font-size: 25px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .encabezado p {
+      margin: 0;
+      opacity: 0.9;
+      font-size: 16px;
+    }
+
+    .contenedor-btn-izq {
+      text-align: left; /* Solo el botón a la izquierda */
+      margin-top: 14px;
+    }
+
+    .btn-abrir-calendario {
+      background: #38bdf8;
+      color: #0f172a;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 14.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.1s ease, background-color 0.2s;
+    }
+
+    .btn-abrir-calendario:hover { background: #7dd3fc; }
+    .btn-abrir-calendario:active { transform: scale(0.97); }
+
+    .formulario {
+      padding: 24px;
+    }
+
+    .campo {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 16px;
+      color: #1e293b;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="date"],
+    select {
+      width: 100%;
+      height: 52px;
+      padding: 0 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      font-size: 16px;
+      background: #f8fafc;
+      color: var(--text);
+      transition: all 0.2s ease;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%22%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748B%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      background-size: 14px;
+      padding-right: 40px;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: #ffffff;
+      box-shadow: 0 0 0 3.5px rgba(37, 99, 235, 0.15);
+    }
+
+    .selector-tipo {
+      display: flex;
+      background: #e2e8f0;
+      padding: 4px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    .btn-tipo {
+      flex: 1;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-tipo.activo {
+      background: #ffffff;
+      color: var(--primary);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .modulo-fecha {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 540px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      body { padding: 10px 5px; }
+      .formulario { padding: 16px; }
+    }
+
+    .info-pantalla-auto {
+      background: #eff6ff;
+      border-left: 5px solid var(--accent);
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #1e40af;
+      margin: 14px 0;
+    }
+
+    .contenedor-bloques-config {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .fila-bloque-config {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      padding: 12px 14px;
+      border-radius: 12px;
+    }
+
+    .fila-bloque-config input[type="checkbox"] {
+      width: 24px;
+      height: 24px;
+      accent-color: var(--primary);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .fila-bloque-config .nombre-bloque {
+      flex: 1;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .fila-bloque-config select {
+      flex: 1.2;
+      height: 44px;
+      font-size: 15px;
+    }
+
+    .btn-guardar-dia {
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      height: 52px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.1s ease, background-color 0.2s;
+    }
+
+    .btn-guardar-dia:active {
+      transform: scale(0.98);
+      background: #1d4ed8;
+    }
+
+    .contenedor-resumen-fechas {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .item-fecha-guardada {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    }
+
+    .cabecera-item-fecha {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--primary);
+      cursor: pointer;
+    }
+
+    .detalles-item-fecha {
+      padding: 14px 16px;
+      background: #f8fafc;
+      border-top: 1px solid var(--border);
+      font-size: 14.5px;
+      line-height: 1.6;
+    }
+
+    .acciones-item-fecha { display: flex; gap: 8px; }
+
+    .btn-editar-fecha, .btn-quitar-fecha {
+      border: none;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-editar-fecha { background: #e0f2fe; color: #0369a1; }
+    .btn-quitar-fecha { background: #fee2e2; color: #991b1b; }
+
+    button.principal {
+      border: none;
+      border-radius: 14px;
+      height: 56px;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.1s ease;
+    }
+
+    button.principal:active { transform: scale(0.98); }
+
+    .boton-comprobar { background: var(--primary); color: white; margin-top: 16px; }
+    .boton-confirmar { background: #16a34a; color: white; margin-top: 14px; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .resultado { display: none; margin-top: 20px; padding: 20px; border-radius: 14px; font-size: 15.5px; }
+    .resultado.disponible { display: block; background: var(--success-bg); border: 1px solid #a7f3d0; color: var(--success-text); }
+    .resultado.ocupado { display: block; background: var(--error-bg); border: 1px solid #fca5a5; color: var(--error-text); }
+    .resultado.error { display: block; background: #fef3c7; border: 1px solid #fde047; color: #92400e; }
+    .resultado h3 { margin: 0 0 8px 0; font-size: 18px; }
+
+    .oculto { display: none !important; }
+    .cargando { text-align: center; padding: 35px; color: var(--text-muted); font-size: 16px; }
+    .exito { text-align: center; padding: 15px 0; }
+    .exito .check { font-size: 58px; margin-bottom: 10px; }
+
+    .grupo-botones { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+    .boton-mismo-profesor { background: var(--primary); color: white; }
+    .boton-nueva { background: #64748b; color: white; }
+
+    /* ESTILOS DE LA VENTANA EMERGENTE (MODAL CALENDARIO) */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+    }
+
+    .modal-contenedor-cal {
+      background: white;
+      border-radius: 18px;
+      width: 100%;
+      max-width: 900px;
+      max-height: 92vh;
+      overflow-y: auto;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      position: relative;
+    }
+
+    .cabecera-modal-cal {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    .cabecera-modal-cal h2 {
+      margin: 0;
+      font-size: 19px;
+      color: var(--primary);
+    }
+
+    .btn-cerrar-modal {
+      background: #e2e8f0;
+      color: #334155;
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      font-weight: bold;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .fc-event { cursor: pointer; border-radius: 6px; font-size: 12.5px; padding: 2px 4px; }
+
+    /* Pop-up secundario con detalle del evento */
+    .modal-detalle-evento {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1001;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .tarjeta-detalle-evento {
+      background: white;
+      border-radius: 14px;
+      padding: 20px;
+      width: 90%;
+      max-width: 420px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body>
+
+<div class="contenedor">
+  <div class="tarjeta">
+    <div class="encabezado">
+      <h1>Reserva de Pantallas Digitales</h1>
+      <p>Colegio Niño Jesús</p>
+      
+      <div class="contenedor-btn-izq">
+        <button type="button" class="btn-abrir-calendario" onclick="abrirCalendarioModal()">
+          📅 Calendario de Reservas
+        </button>
+      </div>
+    </div>
+
+    <div class="formulario" id="formulario">
+      <div id="cargando" class="cargando">Cargando datos...</div>
+
+      <div id="contenido" class="oculto">
+        <div class="grid-2">
+          <div class="campo">
+            <label for="persona">Solicitante</label>
+            <input type="text" id="persona" placeholder="Nombre Apellido">
+          </div>
+          <div class="campo">
+            <label for="correo">Correo institucional</label>
+            <input type="email" id="correo" placeholder="nombre@cnj.cl" autocomplete="email">
+          </div>
+        </div>
+
+        <div class="modulo-fecha">
+          <label style="color:var(--primary); font-size:17px; margin-bottom:12px;">¿Qué deseas agendar?</label>
+          
+          <div class="selector-tipo">
+            <button type="button" id="btnModoClase" class="btn-tipo activo" onclick="cambiarTipoReserva('clase')">📚 Clase Lectiva</button>
+            <button type="button" id="btnModoReunion" class="btn-tipo" onclick="cambiarTipoReserva('reunion')">🤝 Reunión / Evento</button>
+          </div>
+
+          <div class="grid-2">
+            <div class="campo" style="margin-bottom:10px;">
+              <label for="inputFechaTemp">Fecha</label>
+              <input type="date" id="inputFechaTemp" onchange="validarFechaYRenderizar()">
+            </div>
+            
+            <div id="columnaCurso" class="campo" style="margin-bottom:10px;">
+              <label for="inputCursoTemp">Curso</label>
+              <select id="inputCursoTemp" onchange="validarFechaYRenderizar()">
+                <option value="">Cargando cursos...</option>
+              </select>
+            </div>
+
+            <div id="columnaPantallaDirecta" class="campo oculto" style="margin-bottom:10px;">
+              <label for="selectPantallaDirecta">Pantalla</label>
+              <select id="selectPantallaDirecta" onchange="validarFechaYRenderizar()">
+                <option value="">Selecciona pantalla...</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="campoAsuntoReunion" class="campo oculto">
+            <label for="inputAsuntoReunion">Motivo de la reunión</label>
+            <input type="text" id="inputAsuntoReunion" placeholder="Ej: Equipo Directivo / Apoderados">
+          </div>
+
+          <div id="infoPantallaAuto" class="info-pantalla-auto oculto"></div>
+
+          <label style="font-size:15px; margin-top:12px;" id="lblSubtituloBloques">Selecciona bloques y asignaturas:</label>
+          <div id="contenedorBloquesConfig" class="contenedor-bloques-config">
+            <span style="color:var(--text-muted); font-size:14.5px;">Selecciona la fecha arriba...</span>
+          </div>
+
+          <button type="button" class="btn-guardar-dia" onclick="guardarDiaEnEstructura()">
+            <span>➕ Incluir Fecha en la Reserva</span>
+          </button>
+        </div>
+
+        <div class="campo">
+          <label style="font-size:17px;">Días agregados a la lista:</label>
+          <div id="contenedorResumenFechas" class="contenedor-resumen-fechas">
+            <div style="color:var(--text-muted); font-size:14.5px; text-align:center; padding:20px; border:1px dashed var(--border); border-radius:12px;">
+              No has incluido fechas todavía.
+            </div>
+          </div>
+        </div>
+
+        <button class="principal boton-comprobar" id="btnComprobar" onclick="comprobar()">
+          COMPROBAR DISPONIBILIDAD
+        </button>
+
+        <div id="resultado" class="resultado"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VENTANA EMERGENTE CON EL CALENDARIO -->
+<div id="modalCalendario" class="modal-overlay" onclick="cerrarCalendarioModal()">
+  <div class="modal-contenedor-cal" onclick="event.stopPropagation()">
+    <div class="cabecera-modal-cal">
+      <h2>📅 Calendario de Reservas</h2>
+      <button type="button" class="btn-cerrar-modal" onclick="cerrarCalendarioModal()">✕</button>
+    </div>
+    <div id="calendar"></div>
+  </div>
+</div>
+
+<!-- DETALLE DEL EVENTO SELECCIONADO DENTRO DEL CALENDARIO -->
+<div id="modalDetalleEvento" class="modal-detalle-evento" onclick="cerrarDetalleEvento()">
+  <div class="tarjeta-detalle-evento" onclick="event.stopPropagation()">
+    <h3 style="margin-top:0; color:var(--primary); border-bottom:2px solid var(--border); padding-bottom:8px;">Detalle de la Reserva</h3>
+    <div id="cuerpoDetalleEvento"></div>
+    <button type="button" class="btn-guardar-dia" style="margin-top:15px; height:42px;" onclick="cerrarDetalleEvento()">Cerrar</button>
+  </div>
+</div>
+
+<script>
+/*******************************************************
+ * CONEXIÓN CON APPS SCRIPT
+ * Pega aquí la URL de tu implementación (la que termina en /exec).
+ *******************************************************/
+const API_URL = 'PEGA_AQUI_TU_URL_EXEC';
+
+/*
+ * Reemplazo de google.script.run: tiene la misma forma de uso
+ * (withSuccessHandler / withFailureHandler / nombreFuncion(...)),
+ * pero llama al Apps Script con fetch(). Como no envía las cookies
+ * de Google, ya no importa cuántas cuentas tenga abiertas el usuario.
+ */
+function crearLlamadaServidor(alExito, alFallar) {
+  return new Proxy({}, {
+    get(_, nombre) {
+      if (nombre === 'withSuccessHandler') return fn => crearLlamadaServidor(fn, alFallar);
+      if (nombre === 'withFailureHandler') return fn => crearLlamadaServidor(alExito, fn);
+      return (...args) => {
+        fetch(API_URL, {
+          method: 'POST',
+          // text/plain evita la verificación CORS previa, que Apps Script no admite
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ accion: nombre, args: args })
+        })
+          .then(r => {
+            if (!r.ok) throw new Error('No se pudo conectar con el servidor (' + r.status + ').');
+            return r.json();
+          })
+          .then(res => {
+            if (!res.ok) throw new Error(res.error || 'Error desconocido en el servidor.');
+            return res.data;
+          })
+          .then(
+            data => { if (alExito) alExito(data); },
+            err => { if (alFallar) alFallar(err); else console.error(err); }
+          );
+      };
+    }
+  });
+}
+
+const google = { script: { get run() { return crearLlamadaServidor(); } } };
+
+const REGEX_CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+let listaBloquesGlobal = [];
+let listaPantallasGlobal = [];
+let listaAsignaturasGlobal = [];
+let listaCursosGlobal = [];
+let datosCompletosMemoria = null;
+let diasEstructuradosMap = [];
+let pantallaAsignadaAutoGlobal = null;
+let tipoReservaActual = 'clase';
+let objetoFullCalendar = null;
+
+window.onload = function() {
+  google.script.run
+    .withSuccessHandler(cargarDatos)
+    .withFailureHandler(mostrarError)
+    .obtenerDatosFormulario();
+};
+
+function cargarDatos(datos) {
+  datosCompletosMemoria = datos;
+  listaBloquesGlobal = datos.bloques;
+  listaPantallasGlobal = datos.pantallas;
+  listaAsignaturasGlobal = datos.asignaturas;
+  listaCursosGlobal = datos.cursos || [];
+
+  const selectCurso = document.getElementById('inputCursoTemp');
+  selectCurso.innerHTML = '<option value="">Selecciona un curso...</option>';
+  listaCursosGlobal.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c;
+    opt.textContent = c;
+    selectCurso.appendChild(opt);
+  });
+
+  const selectPanDirecta = document.getElementById('selectPantallaDirecta');
+  selectPanDirecta.innerHTML = '<option value="">Selecciona pantalla...</option>';
+  listaPantallasGlobal.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.nombre;
+    opt.textContent = p.nombre;
+    selectPanDirecta.appendChild(opt);
+  });
+
+  const hoy = new Date();
+  const año = hoy.getFullYear();
+  const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+  const dia = String(hoy.getDate()).padStart(2, '0');
+  document.getElementById('inputFechaTemp').min = `${año}-${mes}-${dia}`;
+
+  document.getElementById('cargando').classList.add('oculto');
+  document.getElementById('contenido').classList.remove('oculto');
+}
+
+function cambiarTipoReserva(tipo) {
+  tipoReservaActual = tipo;
+  const btnClase = document.getElementById('btnModoClase');
+  const btnReunion = document.getElementById('btnModoReunion');
+  const colCurso = document.getElementById('columnaCurso');
+  const colPanDirecta = document.getElementById('columnaPantallaDirecta');
+  const campoAsunto = document.getElementById('campoAsuntoReunion');
+  const lblSub = document.getElementById('lblSubtituloBloques');
+
+  if (tipo === 'clase') {
+    btnClase.className = 'btn-tipo activo';
+    btnReunion.className = 'btn-tipo';
+    colCurso.classList.remove('oculto');
+    colPanDirecta.classList.add('oculto');
+    campoAsunto.classList.add('oculto');
+    lblSub.textContent = 'Selecciona bloques y asignaturas:';
+  } else {
+    btnReunion.className = 'btn-tipo activo';
+    btnClase.className = 'btn-tipo';
+    colCurso.classList.add('oculto');
+    colPanDirecta.classList.remove('oculto');
+    campoAsunto.classList.remove('oculto');
+    lblSub.textContent = 'Selecciona el rango de horario:';
+  }
+
+  validarFechaYRenderizar();
+}
+
+function validarFechaYRenderizar() {
+  const inputFecha = document.getElementById('inputFechaTemp');
+  const fechaVal = inputFecha.value;
+
+  if (fechaVal) {
+    const partes = fechaVal.split('-');
+    const fObj = new Date(Number(partes[0]), Number(partes[1]) - 1, Number(partes[2]));
+    const diaSemana = fObj.getDay();
+
+    if (diaSemana === 0 || diaSemana === 6) {
+      alert('⚠️ Las reservas son exclusivamente de lunes a viernes.');
+      inputFecha.value = '';
+      document.getElementById('contenedorBloquesConfig').innerHTML = '<span style="color:var(--text-muted); font-size:14.5px;">Selecciona la fecha (lunes a viernes)...</span>';
+      document.getElementById('infoPantallaAuto').classList.add('oculto');
+      return;
+    }
+  }
+
+  renderizarBloquesParaSeleccion();
+}
+
+function renderizarBloquesParaSeleccion(bloquesPreseleccionados = []) {
+  const fechaVal = document.getElementById('inputFechaTemp').value;
+  const contenedor = document.getElementById('contenedorBloquesConfig');
+  const infoPantalla = document.getElementById('infoPantallaAuto');
+  contenedor.innerHTML = '';
+  infoPantalla.classList.add('oculto');
+  pantallaAsignadaAutoGlobal = null;
+
+  if (!fechaVal) {
+    contenedor.innerHTML = '<span style="color:var(--text-muted); font-size:14.5px;">Selecciona una fecha arriba...</span>';
+    return;
+  }
+
+  if (tipoReservaActual === 'clase') {
+    const cursoIngresado = document.getElementById('inputCursoTemp').value.trim().toLowerCase();
+    if (!cursoIngresado) {
+      contenedor.innerHTML = '<span style="color:var(--text-muted); font-size:14.5px;">Selecciona un curso arriba...</span>';
+      return;
+    }
+
+    const pantallaCoincidente = listaPantallasGlobal.find(p => {
+      if (!p.cursosPermitidos) return false;
+      const permitidos = p.cursosPermitidos.toLowerCase();
+      return permitidos.includes(cursoIngresado) || cursoIngresado.includes(permitidos);
+    });
+
+    if (pantallaCoincidente) {
+      pantallaAsignadaAutoGlobal = pantallaCoincidente.nombre;
+      infoPantalla.innerHTML = `📺 Pantalla Asignada: <u>${escapeHTML(pantallaCoincidente.nombre)}</u>`;
+      infoPantalla.classList.remove('oculto');
+    } else if (listaPantallasGlobal.length > 0) {
+      pantallaAsignadaAutoGlobal = listaPantallasGlobal[0].nombre;
+      infoPantalla.innerHTML = `📺 Pantalla Asignada: <u>${escapeHTML(pantallaAsignadaAutoGlobal)}</u>`;
+      infoPantalla.classList.remove('oculto');
+    }
+
+    const partes = fechaVal.split('-');
+    const fechaObj = new Date(Number(partes[0]), Number(partes[1]) - 1, Number(partes[2]));
+    const esMartes = fechaObj.getDay() === 2;
+
+    listaBloquesGlobal.forEach(b => {
+      if (esMartes && b.id === 'B4') return;
+
+      const fila = document.createElement('div');
+      fila.className = 'fila-bloque-config';
+
+      const chk = document.createElement('input');
+      chk.type = 'checkbox';
+      chk.id = `chk_${b.id}`;
+      chk.value = b.id;
+
+      const labelNombre = document.createElement('span');
+      labelNombre.className = 'nombre-bloque';
+      labelNombre.textContent = b.etiqueta;
+
+      const selectAsignatura = document.createElement('select');
+      selectAsignatura.id = `asignatura_${b.id}`;
+      selectAsignatura.innerHTML = '<option value="">Asignatura...</option>';
+
+      listaAsignaturasGlobal.forEach(a => {
+        const opt = document.createElement('option');
+        opt.value = a;
+        opt.textContent = a;
+        selectAsignatura.appendChild(opt);
+      });
+
+      const bPre = bloquesPreseleccionados.find(bp => bp.bloqueId === b.id);
+      if (bPre) {
+        chk.checked = true;
+        selectAsignatura.value = bPre.asignatura;
+      }
+
+      fila.appendChild(chk);
+      fila.appendChild(labelNombre);
+      fila.appendChild(selectAsignatura);
+      contenedor.appendChild(fila);
+    });
+
+  } else {
+    const selPan = document.getElementById('selectPantallaDirecta').value;
+    if (!selPan) {
+      contenedor.innerHTML = '<span style="color:var(--text-muted); font-size:14.5px;">Selecciona la pantalla arriba...</span>';
+      return;
+    }
+    pantallaAsignadaAutoGlobal = selPan;
+
+    const fila = document.createElement('div');
+    fila.className = 'grid-2';
+
+    const divIni = document.createElement('div');
+    divIni.innerHTML = '<label style="font-size:14.5px;">Inicio:</label><select id="selectHoraInicio"></select>';
+
+    const divFin = document.createElement('div');
+    divFin.innerHTML = '<label style="font-size:14.5px;">Término:</label><select id="selectHoraFin"></select>';
+
+    fila.appendChild(divIni);
+    fila.appendChild(divFin);
+    contenedor.appendChild(fila);
+
+    const selIni = divIni.querySelector('#selectHoraInicio');
+    const selFin = divFin.querySelector('#selectHoraFin');
+
+    for (let h = 8; h <= 18; h++) {
+      ['00', '30'].forEach(m => {
+        if (h === 18 && m === '30') return;
+        const horaStr = String(h).padStart(2, '0') + ':' + m;
+        selIni.appendChild(new Option(horaStr, horaStr));
+        selFin.appendChild(new Option(horaStr, horaStr));
+      });
+    }
+
+    selIni.value = '15:30';
+    selFin.value = '16:30';
+
+    if (bloquesPreseleccionados.length > 0) {
+      selIni.value = bloquesPreseleccionados[0].inicio;
+      selFin.value = bloquesPreseleccionados[0].termino;
+    }
+  }
+}
+
+function guardarDiaEnEstructura() {
+  const fechaVal = document.getElementById('inputFechaTemp').value;
+  if (!fechaVal) { alert('Selecciona una fecha.'); return; }
+
+  let cursoVal = '';
+  let bloquesConfig = [];
+
+  if (tipoReservaActual === 'clase') {
+    cursoVal = document.getElementById('inputCursoTemp').value.trim();
+    if (!cursoVal) { alert('Selecciona un curso.'); return; }
+    if (!pantallaAsignadaAutoGlobal) { alert('No se pudo determinar una pantalla.'); return; }
+
+    listaBloquesGlobal.forEach(b => {
+      const chk = document.getElementById(`chk_${b.id}`);
+      const selA = document.getElementById(`asignatura_${b.id}`);
+
+      if (chk && chk.checked) {
+        if (!selA.value) {
+          alert(`Selecciona la asignatura para el ${b.etiqueta}.`);
+          bloquesConfig = null;
+          return;
+        }
+
+        bloquesConfig.push({
+          bloqueId: b.id,
+          etiqueta: b.etiqueta,
+          inicio: b.inicio,
+          termino: b.termino,
+          pantalla: pantallaAsignadaAutoGlobal,
+          asignatura: selA.value
+        });
+      }
+    });
+
+    if (bloquesConfig === null) return;
+    if (bloquesConfig.length === 0) { alert('Marca al menos un bloque.'); return; }
+
+  } else {
+    cursoVal = document.getElementById('inputAsuntoReunion').value.trim();
+    if (!cursoVal) { alert('Ingresa el motivo de la reunión.'); return; }
+    if (!pantallaAsignadaAutoGlobal) { alert('Selecciona una pantalla.'); return; }
+
+    const ini = document.getElementById('selectHoraInicio').value;
+    const fin = document.getElementById('selectHoraFin').value;
+
+    if (ini >= fin) {
+      alert('La hora de inicio debe ser menor que la hora de término.');
+      return;
+    }
+
+    bloquesConfig.push({
+      bloqueId: 'REUNION',
+      etiqueta: `Reunión (${ini} - ${fin})`,
+      inicio: ini,
+      termino: fin,
+      pantalla: pantallaAsignadaAutoGlobal,
+      asignatura: 'Reunión / Evento'
+    });
+  }
+
+  const nuevoObjetoDia = {
+    fecha: fechaVal,
+    curso: cursoVal,
+    tipoReserva: tipoReservaActual,
+    bloquesConfig: bloquesConfig
+  };
+
+  const indiceExistente = diasEstructuradosMap.findIndex(d => d.fecha === fechaVal);
+  if (indiceExistente !== -1) {
+    diasEstructuradosMap[indiceExistente] = nuevoObjetoDia;
+  } else {
+    diasEstructuradosMap.push(nuevoObjetoDia);
+  }
+
+  document.getElementById('inputFechaTemp').value = '';
+  document.getElementById('inputCursoTemp').value = '';
+  document.getElementById('inputAsuntoReunion').value = '';
+  document.getElementById('infoPantallaAuto').classList.add('oculto');
+  document.getElementById('contenedorBloquesConfig').innerHTML = '<span style="color:var(--text-muted); font-size:14.5px;">Selecciona la fecha (lunes a viernes)...</span>';
+
+  renderizarAcordeonResumen();
+}
+
+function editarDiaEstructurado(fechaVal) {
+  const itemEdicion = diasEstructuradosMap.find(d => d.fecha === fechaVal);
+  if (!itemEdicion) return;
+
+  cambiarTipoReserva(itemEdicion.tipoReserva || 'clase');
+
+  document.getElementById('inputFechaTemp').value = itemEdicion.fecha;
+
+  if (itemEdicion.tipoReserva === 'clase') {
+    document.getElementById('inputCursoTemp').value = itemEdicion.curso;
+  } else {
+    document.getElementById('selectPantallaDirecta').value = itemEdicion.bloquesConfig[0].pantalla;
+    document.getElementById('inputAsuntoReunion').value = itemEdicion.curso;
+  }
+
+  renderizarBloquesParaSeleccion(itemEdicion.bloquesConfig);
+
+  const modulo = document.querySelector('.modulo-fecha');
+  if (modulo) modulo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function eliminarDiaEstructurado(fechaVal) {
+  diasEstructuradosMap = diasEstructuradosMap.filter(d => d.fecha !== fechaVal);
+  renderizarAcordeonResumen();
+}
+
+function renderizarAcordeonResumen() {
+  const contenedor = document.getElementById('contenedorResumenFechas');
+  contenedor.innerHTML = '';
+
+  if (diasEstructuradosMap.length === 0) {
+    contenedor.innerHTML = '<div style="color:var(--text-muted); font-size:14.5px; text-align:center; padding:20px; border:1px dashed var(--border); border-radius:12px;">No has incluido fechas todavía.</div>';
+    return;
+  }
+
+  diasEstructuradosMap.forEach((item, idx) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'item-fecha-guardada';
+
+    let desgloseHTML = '';
+    item.bloquesConfig.forEach(bc => {
+      desgloseHTML += `• <strong>${escapeHTML(bc.etiqueta || bc.bloqueId)}:</strong> ${escapeHTML(bc.pantalla)} <span style="color:var(--accent);">[${escapeHTML(bc.asignatura)}]</span><br>`;
+    });
+
+    const tipoEtiqueta = (item.tipoReserva === 'reunion') ? '🤝 Reunión' : '🎓 Curso';
+
+    wrapper.innerHTML = `
+      <div class="cabecera-item-fecha" onclick="toggleAcordeon(${idx})">
+        <span>📅 ${formatearFechaLarga(item.fecha)} | ${tipoEtiqueta}: ${escapeHTML(item.curso)}</span>
+        <div class="acciones-item-fecha">
+          <button type="button" class="btn-editar-fecha" onclick="event.stopPropagation(); editarDiaEstructurado('${item.fecha}')">✏️ Editar</button>
+          <button type="button" class="btn-quitar-fecha" onclick="event.stopPropagation(); eliminarDiaEstructurado('${item.fecha}')">Quitar</button>
+        </div>
+      </div>
+      <div class="detalles-item-fecha" id="acordeon_det_${idx}">
+        ${desgloseHTML}
+      </div>
+    `;
+
+    contenedor.appendChild(wrapper);
+  });
+}
+
+function toggleAcordeon(idx) {
+  const el = document.getElementById(`acordeon_det_${idx}`);
+  if (el) el.classList.toggle('oculto');
+}
+
+function comprobar() {
+  const datos = obtenerDatosFormulario();
+  if (!validarFormulario(datos)) return;
+
+  const boton = document.getElementById('btnComprobar');
+  boton.disabled = true;
+  boton.textContent = 'COMPROBANDO...';
+  limpiarResultado();
+
+  google.script.run
+    .withSuccessHandler(function(resultado) {
+      boton.disabled = false;
+      boton.textContent = 'COMPROBAR DISPONIBILIDAD';
+      mostrarDisponibilidad(resultado, datos);
+    })
+    .withFailureHandler(function(error) {
+      boton.disabled = false;
+      boton.textContent = 'COMPROBAR DISPONIBILIDAD';
+      mostrarError(error);
+    })
+    .comprobarDisponibilidadAvanzada(datos.reservaEstructurada);
+}
+
+function ejecutarGuardadoDirecto() {
+  const datos = obtenerDatosFormulario();
+  if (!validarFormulario(datos)) return;
+
+  const boton = document.getElementById('btnConfirmar');
+  if (boton) {
+    boton.disabled = true;
+    boton.textContent = 'GUARDANDO...';
+  }
+
+  google.script.run
+    .withSuccessHandler(function(resultado) {
+      if (resultado.exito) {
+        mostrarExito(datos, resultado);
+      } else {
+        if (boton) {
+          boton.disabled = false;
+          boton.textContent = 'CONFIRMAR RESERVA';
+        }
+        mostrarDisponibilidad(resultado, datos);
+      }
+    })
+    .withFailureHandler(function(error) {
+      if (boton) {
+        boton.disabled = false;
+        boton.textContent = 'CONFIRMAR RESERVA';
+      }
+      mostrarError(error);
+    })
+    .guardarReservaAvanzada(datos);
+}
+
+function mostrarDisponibilidad(resultado, datos) {
+  const caja = document.getElementById('resultado');
+
+  if (resultado.disponible) {
+    let detalleResumen = '';
+    datos.reservaEstructurada.forEach(item => {
+      detalleResumen += `<strong>📅 ${formatearFecha(item.fecha)} (${escapeHTML(item.curso)}):</strong><br>`;
+      item.bloquesConfig.forEach(bc => {
+        detalleResumen += `   • ${escapeHTML(bc.etiqueta)} ➔ ${escapeHTML(bc.pantalla)} [${escapeHTML(bc.asignatura)}]<br>`;
+      });
+    });
+
+    caja.className = 'resultado disponible';
+    caja.innerHTML = `
+      <h3>🟢 Horarios Disponibles</h3>
+      <div class="detalle">
+        ${detalleResumen}<br>
+        <strong>Solicitante:</strong> ${escapeHTML(datos.persona)}<br>
+        <strong>Correo:</strong> ${escapeHTML(datos.correo)}
+      </div>
+      <button id="btnConfirmar" class="principal boton-confirmar" onclick="ejecutarGuardadoDirecto()">
+        CONFIRMAR RESERVA
+      </button>
+    `;
+  } else {
+    let detalleConflicto = '';
+    resultado.conflictos.forEach(c => {
+      detalleConflicto += `• <strong>${formatearFecha(c.fecha)} (${c.bloque}):</strong> La pantalla <em>${escapeHTML(c.pantalla)}</em> ya está reservada por ${escapeHTML(c.ocupadoPor)} (${escapeHTML(c.asignaturaOcupado)})<br>`;
+    });
+
+    caja.className = 'resultado ocupado';
+    caja.innerHTML = `
+      <h3>🔴 Conflicto de disponibilidad</h3>
+      <div class="detalle">
+        ${resultado.mensaje || ''}<br><br>
+        ${detalleConflicto}
+      </div>
+    `;
+  }
+
+  caja.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function mostrarExito(datos, resultado) {
+  const formulario = document.getElementById('formulario');
+  let detalleFinal = '';
+  
+  datos.reservaEstructurada.forEach(item => {
+    detalleFinal += `<strong>📅 ${formatearFecha(item.fecha)} (${escapeHTML(item.curso)}):</strong><br>`;
+    item.bloquesConfig.forEach(bc => {
+      detalleFinal += `   • ${escapeHTML(bc.etiqueta)} ➔ ${escapeHTML(bc.pantalla)} [${escapeHTML(bc.asignatura)}]<br>`;
+    });
+  });
+
+  const profeNombre = datos.persona;
+  const profeCorreo = datos.correo;
+
+  formulario.innerHTML = `
+    <div class="exito">
+      <div class="check">✅</div>
+      <h2>Reserva Realizada</h2>
+      <p>Las pantallas digitales se reservaron con éxito.</p>
+      <p style="text-align:left; background:var(--bg); padding:18px; border-radius:12px; border:1px solid var(--border); line-height:1.6; font-size:15px;">
+        ${detalleFinal}
+      </p>
+
+      <p style="font-size:15.5px;">
+        <strong>Solicitante:</strong> ${escapeHTML(profeNombre)}<br>
+        <strong>Correo:</strong> ${escapeHTML(profeCorreo)}
+      </p>
+
+      <p style="font-size:15.5px;">Código de reserva: <strong>${resultado.id}</strong></p>
+
+      <div class="grupo-botones">
+        <button type="button" class="principal boton-mismo-profesor" onclick="reservarOtrosDias('${escapeHTML(profeNombre)}', '${escapeHTML(profeCorreo)}')">
+          📅 RESERVAR OTROS DÍAS O PANTALLAS
+        </button>
+        <button type="button" class="principal boton-nueva" onclick="reiniciarFormularioVacio()">
+          🔄 NUEVA RESERVA (OTRO PROFESOR)
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+/* FUNCIONES DE LA VENTANA EMERGENTE DE CALENDARIO */
+function abrirCalendarioModal() {
+  document.getElementById('modalCalendario').style.display = 'flex';
+
+  if (!objetoFullCalendar) {
+    google.script.run
+      .withSuccessHandler(inicializarFullCalendarModal)
+      .obtenerEventosCalendario();
+  } else {
+    google.script.run
+      .withSuccessHandler(function(eventos) {
+        objetoFullCalendar.removeAllEvents();
+        objetoFullCalendar.addEventSource(eventos);
+        objetoFullCalendar.render();
+      })
+      .obtenerEventosCalendario();
+  }
+}
+
+function cerrarCalendarioModal() {
+  document.getElementById('modalCalendario').style.display = 'none';
+}
+
+function inicializarFullCalendarModal(eventos) {
+  const calendarEl = document.getElementById('calendar');
+  objetoFullCalendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    locale: 'es',
+    firstDay: 1,
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek'
+    },
+    buttonText: { today: 'Hoy', month: 'Mes', week: 'Semana' },
+    eventTimeFormat: {
+      hour: '2-digit',
+      minute: '2-digit',
+      meridiem: false,
+      hour12: false
+    },
+    events: eventos,
+    eventClick: function(info) {
+      mostrarDetalleEventoModal(info.event);
+    }
+  });
+
+  objetoFullCalendar.render();
+}
+
+function mostrarDetalleEventoModal(evento) {
+  const props = evento.extendedProps;
+  const cuerpo = document.getElementById('cuerpoDetalleEvento');
+
+  let textoHorario = props.bloque;
+  if (!textoHorario || textoHorario === 'Reunión libre') {
+    textoHorario = props.horario;
+  }
+
+  cuerpo.innerHTML = `
+    <div style="margin-bottom:8px;"><strong>⏰ Horario:</strong> ${escapeHTML(textoHorario)}</div>
+    <div style="margin-bottom:8px;"><strong>📺 Pantalla:</strong> ${escapeHTML(props.pantalla)}</div>
+    <div style="margin-bottom:8px;"><strong>🎓 Curso / Motivo:</strong> ${escapeHTML(props.curso)}</div>
+    <div style="margin-bottom:8px;"><strong>📚 Asignatura:</strong> ${escapeHTML(props.asignatura)}</div>
+    <div style="margin-bottom:8px;"><strong>👤 Profesor:</strong> ${escapeHTML(props.profesor)}</div>
+    <div style="font-size:12px; color:var(--text-muted); margin-top:10px;">ID: ${escapeHTML(props.id)}</div>
+  `;
+
+  document.getElementById('modalDetalleEvento').style.display = 'flex';
+}
+
+function cerrarDetalleEvento() {
+  document.getElementById('modalDetalleEvento').style.display = 'none';
+}
+
+function reservarOtrosDias(persona, correo) {
+  diasEstructuradosMap = [];
+  restablecerVistaFormulario();
+  document.getElementById('persona').value = persona;
+  document.getElementById('correo').value = correo;
+}
+
+function reiniciarFormularioVacio() {
+  diasEstructuradosMap = [];
+  restablecerVistaFormulario();
+}
+
+function restablecerVistaFormulario() {
+  const formulario = document.getElementById('formulario');
+  formulario.innerHTML = `
+    <div id="contenido">
+      <div class="grid-2">
+        <div class="campo">
+          <label for="persona">Solicitante</label>
+          <input type="text" id="persona" placeholder="Nombre Apellido">
+        </div>
+        <div class="campo">
+          <label for="correo">Correo institucional</label>
+          <input type="email" id="correo" placeholder="nombre@cnj.cl" autocomplete="email">
+        </div>
+      </div>
+
+      <div class="modulo-fecha">
+        <label style="color:var(--primary); font-size:17px; margin-bottom:12px;">¿Qué deseas agendar?</label>
+        
+        <div class="selector-tipo">
+          <button type="button" id="btnModoClase" class="btn-tipo activo" onclick="cambiarTipoReserva('clase')">📚 Clase Lectiva</button>
+          <button type="button" id="btnModoReunion" class="btn-tipo" onclick="cambiarTipoReserva('reunion')">🤝 Reunión / Evento</button>
+        </div>
+
+        <div class="grid-2">
+          <div class="campo" style="margin-bottom:10px;">
+            <label for="inputFechaTemp">Fecha</label>
+            <input type="date" id="inputFechaTemp" onchange="validarFechaYRenderizar()">
+          </div>
+          
+          <div id="columnaCurso" class="campo" style="margin-bottom:10px;">
+            <label for="inputCursoTemp">Curso</label>
+            <select id="inputCursoTemp" onchange="validarFechaYRenderizar()">
+              <option value="">Cargando cursos...</option>
+            </select>
+          </div>
+
+          <div id="columnaPantallaDirecta" class="campo oculto" style="margin-bottom:10px;">
+            <label for="selectPantallaDirecta">Pantalla</label>
+            <select id="selectPantallaDirecta" onchange="validarFechaYRenderizar()">
+              <option value="">Selecciona pantalla...</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="campoAsuntoReunion" class="campo oculto">
+          <label for="inputAsuntoReunion">Motivo de la reunión</label>
+          <input type="text" id="inputAsuntoReunion" placeholder="Ej: Equipo Directivo / Apoderados">
+        </div>
+
+        <div id="infoPantallaAuto" class="info-pantalla-auto oculto"></div>
+
+        <label style="font-size:15px; margin-top:12px;" id="lblSubtituloBloques">Selecciona bloques y asignaturas:</label>
+        <div id="contenedorBloquesConfig" class="contenedor-bloques-config">
+          <span style="color:var(--text-muted); font-size:14.5px;">Selecciona la fecha arriba...</span>
+        </div>
+
+        <button type="button" class="btn-guardar-dia" onclick="guardarDiaEnEstructura()">
+          <span>➕ Incluir Fecha en la Reserva</span>
+        </button>
+      </div>
+
+      <div class="campo">
+        <label style="font-size:17px;">Días agregados a la lista:</label>
+        <div id="contenedorResumenFechas" class="contenedor-resumen-fechas">
+          <div style="color:var(--text-muted); font-size:14.5px; text-align:center; padding:20px; border:1px dashed var(--border); border-radius:12px;">
+            No has incluido fechas todavía.
+          </div>
+        </div>
+      </div>
+
+      <button class="principal boton-comprobar" id="btnComprobar" onclick="comprobar()">
+        COMPROBAR DISPONIBILIDAD
+      </button>
+
+      <div id="resultado" class="resultado"></div>
+    </div>
+  `;
+
+  if (datosCompletosMemoria) {
+    cargarDatos(datosCompletosMemoria);
+  }
+}
+
+function obtenerDatosFormulario() {
+  return {
+    reservaEstructurada: diasEstructuradosMap,
+    persona: document.getElementById('persona').value.trim(),
+    correo: document.getElementById('correo').value.trim()
+  };
+}
+
+function validarFormulario(datos) {
+  if (!datos.persona) { mostrarMensaje('Ingresa tu nombre completo.'); return false; }
+  if (!datos.correo) { mostrarMensaje('Ingresa tu correo electrónico.'); return false; }
+  if (!REGEX_CORREO.test(datos.correo)) { mostrarMensaje('El correo no es válido.'); return false; }
+  if (!datos.reservaEstructurada || datos.reservaEstructurada.length === 0) {
+    mostrarMensaje('Configura la fecha, curso o reunión, luego presiona "➕ Incluir Fecha en la Reserva".');
+    return false;
+  }
+
+  return true;
+}
+
+function mostrarMensaje(texto) {
+  const caja = document.getElementById('resultado');
+  caja.className = 'resultado error';
+  caja.innerHTML = `<h3>⚠️ Atención</h3>${escapeHTML(texto)}`;
+}
+
+function limpiarResultado() {
+  const caja = document.getElementById('resultado');
+  caja.className = 'resultado';
+  caja.innerHTML = '';
+}
+
+function mostrarError(error) {
+  const mensaje = error.message || String(error);
+  const caja = document.getElementById('resultado');
+  caja.className = 'resultado error';
+  caja.innerHTML = `<h3>⚠️ Ocurrió un error</h3>${escapeHTML(mensaje)}`;
+}
+
+function formatearFecha(fecha) {
+  const partes = fecha.split('-');
+  if (partes.length !== 3) return fecha;
+  return partes[2] + '/' + partes[1] + '/' + partes[0];
+}
+
+function formatearFechaLarga(fechaStr) {
+  const partes = fechaStr.split('-');
+  const d = new Date(Number(partes[0]), Number(partes[1]) - 1, Number(partes[2]));
+  const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+  return `${dias[d.getDay()]} ${partes[2]}/${partes[1]}/${partes[0]}`;
+}
+
+function escapeHTML(texto) {
+  if (!texto) return '';
+  return String(texto)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+</script>
+
+</body>
+</html>
